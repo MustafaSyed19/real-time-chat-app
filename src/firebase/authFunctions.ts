@@ -1,4 +1,3 @@
-import { log } from "console";
 import { auth, db } from "./config";
 import {
   createUserWithEmailAndPassword,
