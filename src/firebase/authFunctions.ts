@@ -12,9 +12,9 @@ import {
   updateDoc,
   getDoc,
   deleteDoc,
-  getFirestore,
 } from "firebase/firestore";
 
+//registers user using firebase auth and firestore
 export const registerUser = async (
   email: string,
   password: string,
@@ -34,6 +34,7 @@ export const registerUser = async (
   return usercred.user;
 };
 
+//logs user in using firebase  auth and updates the firestore with the lastLogin timestamp
 export const login = async (email: string, password: string) => {
   const usercred = await signInWithEmailAndPassword(auth, email, password);
   await updateDoc(doc(db, "users", usercred.user.uid), {
@@ -42,6 +43,8 @@ export const login = async (email: string, password: string) => {
   return usercred.user;
 };
 
+
+//Deletes user from firebase auth and firestore
 export const removeUser = async (uid: string) => {
   const user = auth.currentUser;
   if (user) {
@@ -64,6 +67,8 @@ export const removeUser = async (uid: string) => {
   return;
 };
 
+
+//fetches user profile from firestore (everything needed in auth is in the firestore as well to simplify)
 export const fetchUserProfile = async (uid: string) => {
   const docRef = doc(db, "users", uid);
   const docSnap = await getDoc(docRef);
