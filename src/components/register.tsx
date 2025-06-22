@@ -33,7 +33,7 @@ const Register = () => {
 
   return (
     <>
-    <div className="flex items-center justify-center h-1/2 b-gray-100 font-sans text-lg">
+    <div className="flex items-center justify-center h-1/2 bg-gray-100 font-sans text-lg">
         <form
           action=""
           className="flex flex-col gap-4 p-4 bg-white rounded shadow-md w-full max-w-sm"
@@ -47,52 +47,52 @@ const Register = () => {
                           <h1 className="self-center text-2xl">Register</h1>
             </div>
           <div className="pb-2 flex-col">
-            <label htmlFor="" className="block pb-2">
+            <label htmlFor="email" className="block pb-2">
               Email:{" "}
             </label>
             <input
               type="text"
-              name=""
-              id=""
+              name="email"
+              id="email"
               className="w-full shadow-md h-12 border-gray-100 border-1 rounded p-2"
               onChange={(e)=> setEmail(e.target.value)}
               required
             />
           </div>
           <div className="pb-2">
-            <label htmlFor="" className="block pb-2">
+            <label htmlFor="username" className="block pb-2">
               Username:{" "}
             </label>
             <input
               type="text"
-              name=""
-              id=""
+              name="username"
+              id="username"
               className="w-full shadow-md h-12 border-gray-100 border-1 rounded p-2"
             onChange={(e)=> setUsername(e.target.value)}
             required
             />
           </div>
           <div className="pb-2">
-            <label htmlFor="" className="block pb-2">
+            <label htmlFor="password" className="block pb-2">
               Password:{" "}
             </label>
             <input
               type="password"
-              name=""
-              id=""
+              name="password"
+              id="password"
               className="w-full shadow-md h-12 border-gray-100 border-1 rounded p-2"
               onChange={(e)=> setPassword(e.target.value)}
               required
             />
           </div>
           <div className="pb-2">
-            <label htmlFor="" className="block pb-2">
+            <label htmlFor="confirm" className="block pb-2">
               Confirm password:{" "}
             </label>
             <input
               type="password"
-              name=""
-              id=""
+              name="confirm"
+              id="confirm"
               className="w-full shadow-md h-12 border-gray-100 border-1 rounded p-2"
               onChange={(e)=> setConfirm(e.target.value)}
               required

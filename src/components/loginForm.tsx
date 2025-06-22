@@ -27,12 +27,12 @@ import {useState} from 'react';
     <div className="flex items-center justify-center h-screen b-gray-100 font-sans">
         <form action="" onSubmit={frontEndLogin} className="flex flex-col items-center gap-4 p-4 bg-white rounded shadow-md w-full max-w-sm">
             <div className="w-full">
-                <label htmlFor="" className="block mb-1 font-semibold">Email:</label>
-                <input type="text" required name="" className="w-full p-2 border border-gray-300 rounded" onChange={(e)=>setEmail(e.target.value)}/>
+                <label htmlFor="email" className="block mb-1 font-semibold">Email:</label>
+                <input type="text" required name="email" id="email" className="w-full p-2 border border-gray-300 rounded" onChange={(e)=>setEmail(e.target.value)}/>
             </div>
             <div className="w-full">
-                <label htmlFor="" className="block mb-1 font-semibold">Password</label>
-                <input type="password" required name="" className="w-full p-2 border border-gray-300 rounded" onChange={(e)=>setPassword(e.target.value)}/>
+                <label htmlFor="password" className="block mb-1 font-semibold">Password</label>
+                <input type="password" required name="password" id="password" className="w-full p-2 border border-gray-300 rounded" onChange={(e)=>setPassword(e.target.value)}/>
             </div>
             
             <div>
