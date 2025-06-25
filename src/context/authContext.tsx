@@ -14,11 +14,23 @@ import {
   fetchUserProfile,
 } from "../firebase/authFunctions"; // you'll create `fetchUserProfile`
 
+import {
+  searchUser,
+  followUser,
+  getFollowers,
+  getFollowing,
+  unFollowUser,
+  updateBio,
+} from "../firebase/userFunctions";
 interface userProfile {
   email: string;
   username: string;
   createdAt: any;
   lastLogin: any;
+  followers: Array<string>;
+  following: Array<string>;
+  bio: string;
+  profilePictureUrl: "";
   preferences: {
     notifications: boolean;
     theme: "light" | "dark";
@@ -45,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-  /* 
+    /* 
     Sets up a listener for Firebase auth state changes.
     When the user logs in or logs out, this callback runs:
       - Updates the user state with the Firebase auth user object.
@@ -64,6 +76,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             username: newProfile.username,
             createdAt: newProfile.createdAt,
             lastLogin: newProfile.lastLogin,
+            followers: newProfile.followers,
+            following: newProfile.following,
+            bio: newProfile.bio,
+            profilePictureUrl: newProfile.profilePictureUrl,
             preferences: {
               notifications: newProfile.preferences.notifications,
               theme: newProfile.preferences.theme,
@@ -94,6 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         username: newProfile.username,
         createdAt: newProfile.createdAt,
         lastLogin: newProfile.lastLogin,
+        followers: newProfile.followers,
+        following: newProfile.following,
+        bio: newProfile.bio,
+        profilePictureUrl: newProfile.profilePictureUrl,
         preferences: {
           notifications: newProfile.preferences.notifications,
           theme: newProfile.preferences.theme,
@@ -120,6 +140,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         username: newProfile.username,
         createdAt: newProfile.createdAt,
         lastLogin: newProfile.lastLogin,
+        followers: newProfile.followers,
+        following: newProfile.following,
+        bio: newProfile.bio,
+        profilePictureUrl: newProfile.profilePictureUrl,
         preferences: {
           notifications: newProfile.preferences.notifications,
           theme: newProfile.preferences.theme,
@@ -151,3 +175,10 @@ export const useAuth = () => {
   if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 };
+
+async function tester() {
+  const result = await searchUser("must");
+  console.log(result);
+}
+
+tester();
