@@ -6,7 +6,8 @@ import { db } from "./config"
 
 
 /*search for a user based on the starting letters of the search */
-const searchUser = async(username:string) => 
+//figure out what this means LOL 
+export const searchUser = async(username:string) => 
 { 
     const usersref = collection(db, "users")
     const q =  query(
@@ -15,11 +16,16 @@ const searchUser = async(username:string) =>
         where("username","<",username+"\uf8ff")
     );
     const querySnapshot  = await getDocs(q); 
-    return querySnapshot; 
+      const users = querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  return users;
 }
 
 //this allows you to follow a user 
-const followUser = async(userID:string, friendID:string) => 
+export const followUser = async(userID:string, friendID:string) => 
 { 
     const userDocRef = doc(db, "users", userID)
     await updateDoc(userDocRef, 
@@ -38,7 +44,7 @@ const followUser = async(userID:string, friendID:string) =>
 
 //this allows you to unfollow a user 
 
-const unFollowUser = async(userID:string, friendID:string) => 
+export const unFollowUser = async(userID:string, friendID:string) => 
 { 
     const userDocRef = doc(db, "users", userID)
     await updateDoc(userDocRef, 
@@ -56,7 +62,7 @@ const unFollowUser = async(userID:string, friendID:string) =>
 }
 
 //this allows you to retrieve the users that follow a profile 
-const getFollowers= async(userID:string) => 
+export const getFollowers= async(userID:string) => 
 { 
     const userDocRef = doc(db,"users",userID)
     const q  =  await getDoc(userDocRef)
@@ -64,7 +70,7 @@ const getFollowers= async(userID:string) =>
 }
 
 //this allows you to retrieve the users that you follow 
-const getFollowing = async(userID:string)=> 
+export const getFollowing = async(userID:string)=> 
 { 
     const userDocRef = doc(db,"users",userID)
     const q  =  await getDoc(userDocRef)
@@ -75,7 +81,7 @@ const getFollowing = async(userID:string)=>
 impact on anything else*/
 
 //updates a users bio with the param string
-const updateBio = async(userID:string, bio:string)=> 
+export const updateBio = async(userID:string, bio:string)=> 
 { 
     const userDocRef = doc(db,"users",userID)
     await setDoc(userDocRef, {"bio": bio}); 
