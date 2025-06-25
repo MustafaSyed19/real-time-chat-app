@@ -25,6 +25,10 @@ export const registerUser = async (
     username,
     createdAt: serverTimestamp(),
     lastLogin: serverTimestamp(),
+    followers: [], 
+    following: [], 
+    bio:'', 
+    profilePictureUrl:'',
     preferences: {
       notifications: true,
       theme: "dark",
