@@ -10,3 +10,6 @@ My objective with this app is to learn about real time chatting as well as fireb
 - ⚛️ React
 - 🎨 Tailwind CSS
 - 🌐 Firebase Hosting
+
+## For Reference 
+- For reference to myself in the future i'm using "npx tsx filepath" to test my typescript files 
