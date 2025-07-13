@@ -11,6 +11,7 @@ import {
   updateDoc,
   getDoc,
   deleteDoc,
+  collection,
 } from "firebase/firestore";
 
 //registers user using firebase auth and firestore
@@ -20,7 +21,8 @@ export const registerUser = async (
   username: string
 ) => {
   const usercred = await createUserWithEmailAndPassword(auth, email, password);
-  await setDoc(doc(db, "users", usercred.user.uid), {
+  const userRef = doc(db, "users", usercred.user.uid);
+  await setDoc(userRef, {
     email,
     username,
     createdAt: serverTimestamp(),
@@ -34,6 +36,11 @@ export const registerUser = async (
       theme: "dark",
     },
   });
+  const chatsRef = collection(doc(db, "users", usercred.user.uid),"chats"); 
+  await setDoc(doc(chatsRef,"placeholder"), { 
+    initializedAt:serverTimestamp(),
+    note:"Placeholder to create chat collection in users object"
+  })
   return usercred.user;
 };
 
@@ -48,7 +55,7 @@ export const login = async (email: string, password: string) => {
 
 
 //Deletes user from firebase auth and firestore
-export const removeUser = async (uid: string) => {
+export const removeCurrentUser = async () => {
   const user = auth.currentUser;
   if (user) {
     try {
@@ -58,7 +65,7 @@ export const removeUser = async (uid: string) => {
         console.error(error);
     }
     try {
-      const usercred = await deleteDoc(doc(db, "users", uid));
+      const usercred = await deleteDoc(doc(db, "users", user.uid));
       console.log("deleted user from firestore");
     } catch (error) {
         console.error(error);
@@ -69,6 +76,7 @@ export const removeUser = async (uid: string) => {
   }
   return;
 };
+
 
 
 //fetches user profile from firestore (everything needed in auth is in the firestore as well to simplify)
