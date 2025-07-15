@@ -3,9 +3,12 @@
 import {initializeApp} from 'firebase/app'; 
 import {getAuth} from 'firebase/auth'; 
 import { getFirestore } from 'firebase/firestore';
-import dotenv from "dotenv";
+import dotenv from 'dotenv'; 
+import path from "path"; 
 
-dotenv.config();
+const envPath = path.resolve(process.cwd());
+dotenv.config({path: path.resolve(envPath,"..","..",".env")});
+
 const firebaseConfig = {
   apiKey: process.env.apiKey,
   authDomain: process.env.authDomain,

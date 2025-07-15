@@ -36,11 +36,6 @@ export const registerUser = async (
       theme: "dark",
     },
   });
-  const chatsRef = collection(doc(db, "users", usercred.user.uid),"chats"); 
-  await setDoc(doc(chatsRef,"placeholder"), { 
-    initializedAt:serverTimestamp(),
-    note:"Placeholder to create chat collection in users object"
-  })
   return usercred.user;
 };
 
