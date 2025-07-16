@@ -132,6 +132,7 @@ export const createDMChat = async (memberIDs: Array<string>) => {
 
       const batch = writeBatch(db);
 
+      //TODO add chatImage property and take it from each users image
       //add this chat to the chats user1 is apart of
       const user1Ref = doc(db, "users", memberIDs[0], "chats", docRef.id);
       console.log("📝 Adding chat to user 1's chat list:", user1Ref.path);
@@ -556,16 +557,98 @@ const sendImageMessage = async (
 };
 
 //can only edit data of type text
-export const editMessage = async () => {};
+export const editMessage = async (
+  chatID: string,
+  messageID: string,
+  updatedString: string
+) => {
+  console.log("✏️ editMessage called with:", {
+    chatID,
+    messageID,
+    updatedContentLength: updatedString.length,
+  });
 
-export const deleteMessage = async () => {};
-export const getChats = async () => {};
+  try {
+    const ref = doc(db, "chats", chatID, "messages", messageID);
+    console.log("📝 Message document path:", ref.path);
+
+    //verify that the message is of type text
+    console.log("🔍 Fetching message to verify type");
+    const entry = await getDoc(ref);
+
+    if (!entry.exists()) {
+      console.error("❌ Message document does not exist");
+      return;
+    }
+
+    const messageType = entry.data()?.type;
+    const messageData = entry.data()?.content;
+    console.log("📋 Message data:", {
+      type: messageType,
+      currentContent: messageData?.content,
+    });
+
+    if (messageType !== "text") {
+      console.log(
+        "❌ Cannot edit non-text message. Message type:",
+        messageType
+      );
+      return;
+    }
+
+    console.log("✅ Message type verified as text, proceeding with edit");
+    console.log("📝 Original content:", messageData);
+    console.log("📝 Updated content:", updatedString);
+
+    await updateDoc(ref, {
+      content: updatedString,
+      isEdited: true,
+      editedAt:serverTimestamp()
+    });
+    console.log("✅ Message edited successfully");
+    return chatID;
+  } catch (error) {
+    console.error("❌ Error in editMessage:", error);
+    throw error;
+  }
+};
+
+//deletes a message in a chat
+export const deleteMessage = async (chatID: string, messageID: string) => {
+  try {
+    const ref = doc(db, "chats", chatID, "messages", messageID);
+    console.log("📝 Message document path:", ref.path);
+
+    // Optional: Check if the document exists
+    const docSnap = await getDoc(ref);
+    if (!docSnap.exists()) {
+      throw new Error(`Message ${messageID} not found in chat ${chatID}`);
+    }
+
+    await updateDoc(ref, {
+      isDeleted: true,
+      deletedAt: serverTimestamp()
+    });
+
+    return { success: true, message: "Message deleted successfully" };
+  } catch (error) {
+    console.error("❌ Error in deleteMessage:", error);
+    throw error;
+  }
+};
+
+//gets chats for a specific user
+export const getChats = async () => {
+  
+};
+
+//gets messages from a specific chat
 export const getMessages = async () => {};
 
 const main = async () => {
   console.log("🧪 Starting test...");
   try {
-    const result = sendMessage();
+
   } catch (error) {
     console.error("❌ Test failed:", error);
   }
