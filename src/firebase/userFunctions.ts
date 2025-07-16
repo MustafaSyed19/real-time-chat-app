@@ -1,7 +1,7 @@
 /*this file will be used to make modifications to the users account including followers, 
 following, profilePictureUrl and preferences */
 
-import { collection, query, where, getDocs, doc, updateDoc, arrayRemove, arrayUnion, getDoc, setDoc } from "firebase/firestore"
+import { collection, query, where, getDocs, doc, updateDoc, arrayRemove, arrayUnion, getDoc } from "firebase/firestore"
 import { db } from "./config"
 
 
@@ -84,13 +84,13 @@ impact on anything else*/
 export const updateBio = async(userID:string, bio:string)=> 
 { 
     const userDocRef = doc(db,"users",userID)
-    await setDoc(userDocRef, {"bio": bio}); 
+    await updateDoc(userDocRef, {"bio": bio}); 
 }
 
 //updates the users profile picture with a picture that has been uploaded
 const updateProfilePic = ()=> 
 { 
-
+    
 }
 
 
