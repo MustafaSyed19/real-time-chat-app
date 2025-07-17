@@ -12,7 +12,10 @@ import {
   setDoc,
   deleteDoc,
   CollectionReference,
+  where,
   type DocumentData,
+  query,
+  orderBy,
 } from "firebase/firestore";
 import { db, storage } from "./config";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
@@ -20,7 +23,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 export const createChat = async (memberIDs: Array<string>) => {
   console.log("🚀 createChat called with:", memberIDs);
 
-  if (memberIDs.length < 2) {
+  if (memberIDs.length === 0) {
     console.log("❌ Not enough members (need at least 2)");
     return;
   }
@@ -254,6 +257,11 @@ export const addMember = async (chatID: string, memberID: string) => {
     const chatType = chatDoc.data()?.chatType;
     console.log("📋 Chat type:", chatType);
 
+    if (chatDoc.data()?.participants.includes(memberID)) {
+      console.log("❌ member already in groupchat");
+      return;
+    }
+
     let retID;
 
     //for dms
@@ -347,10 +355,23 @@ const groupAddMember = async (chatID: string, memberID: string) => {
 
 export const removeMember = async (chatID: string, memberID: string) => {
   console.log("👥 removeMember called with:", { chatID, memberID });
-
   try {
     //for group-chats
     const chatRef = doc(db, "chats", chatID);
+    let updatedChatDoc = await getDoc(chatRef);
+    
+    //verify if the chat is a DM and if it is return else continue 
+    if((updatedChatDoc.data()?.chatType) === "direct")
+    { 
+      console.log("❌ Cannot remove users from direct messages");
+      return;
+    }
+    //check if a participant exists in the chat that you are trying to delete 
+    if(!((updatedChatDoc.data()?.participants).includes(memberID)))
+    { 
+      console.log("❌ user is not apart of the groupchat ");
+      return;
+    }
     console.log("🔍 Removing member from participants array");
 
     await updateDoc(chatRef, {
@@ -358,12 +379,12 @@ export const removeMember = async (chatID: string, memberID: string) => {
     });
 
     //delete the chat if there are no members are apart of it
+    updatedChatDoc = await getDoc(chatRef);
     console.log("🔍 Checking remaining participants");
-    const updatedChatDoc = await getDoc(chatRef);
     const participants = updatedChatDoc.data()?.participants;
     console.log("📋 Remaining participants:", participants);
 
-    if (participants?.length === 0) {
+    if (participants?.length == 0) {
       console.log("🗑️ No participants remaining, deleting chat");
       await deleteDoc(chatRef);
     }
@@ -471,7 +492,7 @@ export const sendMessage = async (
 
 const sendTextMessage = async (
   messageRef: CollectionReference<DocumentData, DocumentData>,
-  content: String,
+  content: string,
   senderID: string,
   replyID?: string
 ) => {
@@ -486,7 +507,7 @@ const sendTextMessage = async (
       senderID: senderID,
       isEdited: false,
       isDeleted: false,
-      replyID: replyID,
+      ...(replyID !== undefined && {replyID})
     });
 
     console.log("✅ Text message document created with ID:", docRef.id);
@@ -545,7 +566,7 @@ const sendImageMessage = async (
       senderID: senderID,
       isEdited: false,
       isDeleted: false,
-      replyID: replyID,
+      ...(replyID!==undefined && {replyID}),
     });
 
     console.log("✅ Image message document created with ID:", docRef.id);
@@ -581,6 +602,12 @@ export const editMessage = async (
       return;
     }
 
+    if(entry.data()?.isDeleted)
+    { 
+      console.error("❌ Message has already been deleted, cannot edit")
+      return;
+    }
+
     const messageType = entry.data()?.type;
     const messageData = entry.data()?.content;
     console.log("📋 Message data:", {
@@ -603,7 +630,7 @@ export const editMessage = async (
     await updateDoc(ref, {
       content: updatedString,
       isEdited: true,
-      editedAt:serverTimestamp()
+      editedAt: serverTimestamp(),
     });
     console.log("✅ Message edited successfully");
     return chatID;
@@ -616,19 +643,27 @@ export const editMessage = async (
 //deletes a message in a chat
 export const deleteMessage = async (chatID: string, messageID: string) => {
   try {
+    console.log("🚀 deleteMessage called with:");
+    console.log("  🔹 chatID:", chatID);
+    console.log("  🔹 messageID:", messageID);
+
     const ref = doc(db, "chats", chatID, "messages", messageID);
     console.log("📝 Message document path:", ref.path);
 
-    // Optional: Check if the document exists
+    // Step 1: Check if the document exists
     const docSnap = await getDoc(ref);
     if (!docSnap.exists()) {
+      console.warn(`⚠️ Message with ID '${messageID}' not found in chat '${chatID}'`);
       throw new Error(`Message ${messageID} not found in chat ${chatID}`);
     }
+    console.log("✅ Message document found. Proceeding to soft-delete...");
 
+    // Step 2: Soft-delete the message
     await updateDoc(ref, {
       isDeleted: true,
-      deletedAt: serverTimestamp()
+      deletedAt: serverTimestamp(),
     });
+    console.log("🗑️ Message marked as deleted successfully");
 
     return { success: true, message: "Message deleted successfully" };
   } catch (error) {
@@ -637,18 +672,86 @@ export const deleteMessage = async (chatID: string, messageID: string) => {
   }
 };
 
-//gets chats for a specific user
-export const getChats = async () => {
-  
+
+// Gets chats for a specific user
+export const getChats = async (userID: string) => {
+  console.log("📥 Fetching chats for user:", userID);
+
+  const userRef = collection(db, "users", userID, "chats");
+  const snapshot = await getDocs(userRef);
+
+  console.log("📄 User chat references found:", snapshot.size);
+
+  const userChats = snapshot.docs.map((doc) => {
+    const chatMeta = {
+      id: doc.id,
+      ...doc.data(),
+    };
+    console.log("📄 User chat meta:", chatMeta);
+    return chatMeta;
+  });
+
+  // Fetch full chat data for each chat the user is part of
+  for (let x = 0; x < userChats.length; x++) {
+    const chatID = userChats[x].id;
+    const chatRef = doc(db, "chats", chatID);
+
+    console.log(`🔄 Fetching full chat data for chatID: ${chatID}`);
+    const chatSnap = await getDoc(chatRef);
+
+    if (chatSnap.exists()) {
+      const chatData = chatSnap.data();
+      console.log("✅ Chat data found:", chatData);
+      userChats[x] = {
+        ...userChats[x],
+        ...chatData,
+      };
+    } else {
+      console.warn(`⚠️ Chat document missing for ID: ${chatID}`);
+    }
+  }
+
+  console.log("📦 Final merged userChats:", userChats);
+  return userChats;
 };
 
 //gets messages from a specific chat
-export const getMessages = async () => {};
+// Gets non-deleted messages from a specific chat
+export const getMessages = async (chatID: string) => {
+  console.log("📥 Getting messages for chat:", chatID);
+
+  const chatRef = collection(db, "chats", chatID, "messages");
+
+  // Create a filtered + ordered query
+  const q = query(
+    chatRef,
+    orderBy("timestamp"),
+    where("isDeleted", "==", false)
+  );
+  console.log(
+    "🔍 Query created for non-deleted messages, ordered by timestamp"
+  );
+
+  const messageSnapshot = await getDocs(q);
+  console.log("📄 Number of messages fetched:", messageSnapshot.size);
+
+  const messages = messageSnapshot.docs.map((doc, index) => {
+    const messageMeta = {
+      id: doc.id,
+      ...doc.data(),
+    };
+    console.log(`📨 [${index}] Message ID: ${doc.id}, data:`, messageMeta);
+    return messageMeta;
+  });
+
+  console.log("✅ Finished mapping messages:", messages.length);
+  return messages;
+};
 
 const main = async () => {
   console.log("🧪 Starting test...");
   try {
-
+    await getMessages("7bNZorM4kwJRDUUJQp32")
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

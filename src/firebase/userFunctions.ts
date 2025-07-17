@@ -91,10 +91,9 @@ export const updateBio = async(userID:string, bio:string)=>
 const updateProfilePic = ()=> 
 { 
     
+
+
 }
-
-
-
 
 //TODO 
 const getNotification = ()=> 
