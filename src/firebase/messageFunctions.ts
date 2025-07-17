@@ -126,6 +126,10 @@ export const createDMChat = async (memberIDs: Array<string>) => {
       const username1 = user1Doc.data()?.username;
       const username2 = user2Doc.data()?.username;
 
+      const pfp1 =user1Doc.data()?.profilePicture;
+      const pfp2 =user2Doc.data()?.profilePicture;
+
+
       console.log(`👤 User 1 username: ${username1}`);
       console.log(`👤 User 2 username: ${username2}`);
 
@@ -144,6 +148,7 @@ export const createDMChat = async (memberIDs: Array<string>) => {
         isMuted: false,
         unreadCount: 0,
         chatName: username2,
+        ...(pfp2 !== undefined && {chatImage:pfp2})
       });
 
       //add this chat to the chats user2 is apart of
@@ -154,6 +159,7 @@ export const createDMChat = async (memberIDs: Array<string>) => {
         isMuted: false,
         unreadCount: 0,
         chatName: username1,
+        ...(pfp1 !== undefined && {chatImage:pfp1})
       });
 
       console.log("🔄 Committing batch operations for user chat documents");
@@ -540,9 +546,9 @@ const sendImageMessage = async (
     }
 
     //generates a file path for the image
-    const filePath = `${chatID}/${senderID}/${
+    const filePath = `imageMessages/${
       file.name
-    }/${crypto.randomUUID()}`;
+    }${crypto.randomUUID()}`;
     console.log("📁 Generated file path:", filePath);
 
     const fileRef = ref(storage, filePath);
@@ -751,7 +757,7 @@ export const getMessages = async (chatID: string) => {
 const main = async () => {
   console.log("🧪 Starting test...");
   try {
-    await getMessages("7bNZorM4kwJRDUUJQp32")
+    await createChat(["68QcFBYk00h7FvyNzzzJ","9VFD0RyPGUev5w0HhkigjwMl6853"]);
   } catch (error) {
     console.error("❌ Test failed:", error);
   }
