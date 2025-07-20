@@ -147,7 +147,7 @@ export const createDMChat = async (memberIDs: Array<string>) => {
         chatType: "direct",
         isMuted: false,
         unreadCount: 0,
-        chatName: username2,
+        recieverID: memberIDs[1],
         ...(pfp2 !== undefined && {chatImage:pfp2})
       });
 
@@ -158,7 +158,7 @@ export const createDMChat = async (memberIDs: Array<string>) => {
         chatType: "direct",
         isMuted: false,
         unreadCount: 0,
-        chatName: username1,
+        recieverID: memberIDs[0],
         ...(pfp1 !== undefined && {chatImage:pfp1})
       });
 
