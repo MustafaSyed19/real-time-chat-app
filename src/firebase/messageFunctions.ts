@@ -147,6 +147,7 @@ export const createDMChat = async (memberIDs: Array<string>) => {
         chatType: "direct",
         isMuted: false,
         unreadCount: 0,
+        //this might be redundant
         recieverID: memberIDs[1],
         ...(pfp2 !== undefined && {chatImage:pfp2})
       });
@@ -158,6 +159,7 @@ export const createDMChat = async (memberIDs: Array<string>) => {
         chatType: "direct",
         isMuted: false,
         unreadCount: 0,
+        //this might be redundant
         recieverID: memberIDs[0],
         ...(pfp1 !== undefined && {chatImage:pfp1})
       });
