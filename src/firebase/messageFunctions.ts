@@ -539,9 +539,9 @@ const sendImageMessage = async (
     size: file.size,
     type: file.type,
   });
-
-  try {
+  
     //upload file to firebase storage and retrieve the link to it
+  try {
     if (!file || !file.type.startsWith("image/")) {
       console.error("❌ Invalid file type:", file.type);
       throw new Error("Invalid file type. Only images are allowed.");
