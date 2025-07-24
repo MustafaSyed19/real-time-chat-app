@@ -1,3 +1,4 @@
+
 import {
   addDoc,
   arrayUnion,
@@ -126,9 +127,8 @@ export const createDMChat = async (memberIDs: Array<string>) => {
       const username1 = user1Doc.data()?.username;
       const username2 = user2Doc.data()?.username;
 
-      const pfp1 =user1Doc.data()?.profilePicture;
-      const pfp2 =user2Doc.data()?.profilePicture;
-
+      const pfp1 = user1Doc.data()?.profilePicture;
+      const pfp2 = user2Doc.data()?.profilePicture;
 
       console.log(`👤 User 1 username: ${username1}`);
       console.log(`👤 User 2 username: ${username2}`);
@@ -149,7 +149,7 @@ export const createDMChat = async (memberIDs: Array<string>) => {
         unreadCount: 0,
         //this might be redundant
         recieverID: memberIDs[1],
-        ...(pfp2 !== undefined && {chatImage:pfp2})
+        ...(pfp2 !== undefined && { chatImage: pfp2 }),
       });
 
       //add this chat to the chats user2 is apart of
@@ -161,7 +161,7 @@ export const createDMChat = async (memberIDs: Array<string>) => {
         unreadCount: 0,
         //this might be redundant
         recieverID: memberIDs[0],
-        ...(pfp1 !== undefined && {chatImage:pfp1})
+        ...(pfp1 !== undefined && { chatImage: pfp1 }),
       });
 
       console.log("🔄 Committing batch operations for user chat documents");
@@ -367,16 +367,14 @@ export const removeMember = async (chatID: string, memberID: string) => {
     //for group-chats
     const chatRef = doc(db, "chats", chatID);
     let updatedChatDoc = await getDoc(chatRef);
-    
-    //verify if the chat is a DM and if it is return else continue 
-    if((updatedChatDoc.data()?.chatType) === "direct")
-    { 
+
+    //verify if the chat is a DM and if it is return else continue
+    if (updatedChatDoc.data()?.chatType === "direct") {
       console.log("❌ Cannot remove users from direct messages");
       return;
     }
-    //check if a participant exists in the chat that you are trying to delete 
-    if(!((updatedChatDoc.data()?.participants).includes(memberID)))
-    { 
+    //check if a participant exists in the chat that you are trying to delete
+    if (!updatedChatDoc.data()?.participants.includes(memberID)) {
       console.log("❌ user is not apart of the groupchat ");
       return;
     }
@@ -515,7 +513,7 @@ const sendTextMessage = async (
       senderID: senderID,
       isEdited: false,
       isDeleted: false,
-      ...(replyID !== undefined && {replyID})
+      ...(replyID !== undefined && { replyID }),
     });
 
     console.log("✅ Text message document created with ID:", docRef.id);
@@ -539,8 +537,8 @@ const sendImageMessage = async (
     size: file.size,
     type: file.type,
   });
-  
-    //upload file to firebase storage and retrieve the link to it
+
+  //upload file to firebase storage and retrieve the link to it
   try {
     if (!file || !file.type.startsWith("image/")) {
       console.error("❌ Invalid file type:", file.type);
@@ -548,9 +546,7 @@ const sendImageMessage = async (
     }
 
     //generates a file path for the image
-    const filePath = `imageMessages/${
-      file.name
-    }${crypto.randomUUID()}`;
+    const filePath = `imageMessages/${file.name}${crypto.randomUUID()}`;
     console.log("📁 Generated file path:", filePath);
 
     const fileRef = ref(storage, filePath);
@@ -574,7 +570,7 @@ const sendImageMessage = async (
       senderID: senderID,
       isEdited: false,
       isDeleted: false,
-      ...(replyID!==undefined && {replyID}),
+      ...(replyID !== undefined && { replyID }),
     });
 
     console.log("✅ Image message document created with ID:", docRef.id);
@@ -610,9 +606,8 @@ export const editMessage = async (
       return;
     }
 
-    if(entry.data()?.isDeleted)
-    { 
-      console.error("❌ Message has already been deleted, cannot edit")
+    if (entry.data()?.isDeleted) {
+      console.error("❌ Message has already been deleted, cannot edit");
       return;
     }
 
@@ -661,7 +656,9 @@ export const deleteMessage = async (chatID: string, messageID: string) => {
     // Step 1: Check if the document exists
     const docSnap = await getDoc(ref);
     if (!docSnap.exists()) {
-      console.warn(`⚠️ Message with ID '${messageID}' not found in chat '${chatID}'`);
+      console.warn(
+        `⚠️ Message with ID '${messageID}' not found in chat '${chatID}'`
+      );
       throw new Error(`Message ${messageID} not found in chat ${chatID}`);
     }
     console.log("✅ Message document found. Proceeding to soft-delete...");
@@ -679,7 +676,6 @@ export const deleteMessage = async (chatID: string, messageID: string) => {
     throw error;
   }
 };
-
 
 // Gets chats for a specific user
 export const getChats = async (userID: string) => {
@@ -759,7 +755,7 @@ export const getMessages = async (chatID: string) => {
 const main = async () => {
   console.log("🧪 Starting test...");
   try {
-    await createChat(["68QcFBYk00h7FvyNzzzJ","9VFD0RyPGUev5w0HhkigjwMl6853"]);
+    await createChat(["68QcFBYk00h7FvyNzzzJ", "9VFD0RyPGUev5w0HhkigjwMl6853"]);
   } catch (error) {
     console.error("❌ Test failed:", error);
   }
