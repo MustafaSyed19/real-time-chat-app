@@ -1,7 +1,7 @@
-import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router';
 import "./App.css";
 import { Suspense, lazy } from "react";
-
+import { AuthProvider } from '../backend/context/authContext';
 function App() {
   const LoginForm = lazy(() => import("./pages/loginForm"));
   const Register = lazy(()=>import('./pages/registrationPage'));
@@ -13,9 +13,11 @@ function App() {
     {path:'/home', element:<Home></Home>}
   ]);
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <RouterProvider router={router}></RouterProvider>
-    </Suspense>
+    <AuthProvider>
+      <Suspense fallback={<div>Loading...</div>}>
+        <RouterProvider router={router}></RouterProvider>
+      </Suspense>
+    </AuthProvider>
   );
 }
 

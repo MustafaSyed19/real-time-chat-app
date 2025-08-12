@@ -7,12 +7,12 @@ import React, {
 } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import type { User } from "firebase/auth";
-import { auth, db } from "../firebase/config";
+import { auth, db } from "../../backend/firebase/config";
 import {
   login,
   registerUser,
   fetchUserProfile,
-} from "../firebase/authFunctions"; // you'll create `fetchUserProfile`
+} from "../../backend/firebase/authFunctions"; // you'll create `fetchUserProfile`
 
 import {
   searchUser,
@@ -21,7 +21,7 @@ import {
   getFollowing,
   unFollowUser,
   updateBio,
-} from "../firebase/userFunctions";
+} from "../../backend/firebase/userFunctions";
 interface userProfile {
   email: string;
   username: string;
@@ -175,10 +175,3 @@ export const useAuth = () => {
   if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 };
-
-async function tester() {
-  const result = await searchUser("must");
-  console.log(result);
-}
-
-tester();

@@ -14,7 +14,6 @@ import {
 } from "firebase/firestore";
 import { db, storage } from "./config";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { randomUUID } from "crypto";
 
 /*search for a user based on the starting letters of the search */
 //figure out what this means LOL
@@ -118,12 +117,3 @@ const getNotification = () => {};
 
 //try this later if possible for now this is damn hard
 const suggestUsersToFollow = () => {};
-
-const main = async () => {
-  const res = await fetch("https://picsum.photos/200/300");
-  const image = await res.blob();
-  const file = new File([image], "image", {type: image.type});
-  await updateProfilePic("68QcFBYk00h7FvyNzzzJ",file);
-};
-
-main();
